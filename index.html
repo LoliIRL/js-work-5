@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа 5 - Promise, async/await</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: linear-gradient(145deg, #2b3a4a 0%, #1d2a35 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            border-radius: 20px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #1e3c72;
+            border-bottom: 5px solid #4a90e2;
+            padding-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            font-size: 28px;
+            margin: 45px 0 25px 0;
+            color: #1e3c72;
+            border-bottom: 4px solid #4a90e2;
+            padding-bottom: 12px;
+            background: linear-gradient(to right, #f8f9fa, transparent);
+            padding-left: 15px;
+        }
+        
+        h3 {
+            font-size: 24px;
+            margin: 30px 0 20px 0;
+            color: #2c3e50;
+            background: #e8f0fe;
+            padding: 12px 25px;
+            border-radius: 10px;
+            border-left: 8px solid #4a90e2;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .task {
+            margin-bottom: 45px;
+            padding: 30px;
+            background: #f8faff;
+            border-left: 10px solid #4a90e2;
+            border-radius: 0 15px 15px 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .task:hover {
+            transform: translateX(5px);
+        }
+        
+        .task-number {
+            font-weight: bold;
+            color: #4a90e2;
+            margin-right: 12px;
+            font-size: 22px;
+            background: #e3f2fd;
+            padding: 5px 12px;
+            border-radius: 25px;
+        }
+        
+        pre {
+            background: #1e2b3a;
+            color: #e8f0fe;
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 15px;
+            overflow-x: auto;
+            margin: 25px 0;
+            line-height: 1.8;
+            border: 2px solid #4a90e2;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        
+        .result {
+            background: linear-gradient(145deg, #f0f7ff, #e6f0fa);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+            font-size: 16px;
+            line-height: 1.9;
+            border: 2px solid #90caf9;
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.2);
+        }
+        
+        .result-title {
+            font-weight: bold;
+            color: #1565c0;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px dashed #90caf9;
+            padding-bottom: 10px;
+        }
+        
+        .result-title::before {
+            content: "✨";
+            font-size: 28px;
+        }
+        
+        .explanation {
+            background: #fef9e7;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 8px solid #f1c40f;
+            font-style: italic;
+            color: #7d5d23;
+            box-shadow: 0 3px 10px rgba(241, 196, 15, 0.2);
+        }
+        
+        .code-block {
+            background: #1e2b3a;
+            color: #e8f0fe;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            margin: 20px 0;
+            border-left: 6px solid #4a90e2;
+        }
+        
+        .warning {
+            color: #c62828;
+            font-weight: bold;
+            background: #ffebee;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 6px solid #c62828;
+        }
+        
+        .success {
+            color: #2e7d32;
+            font-weight: bold;
+            background: #e8f5e9;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 6px solid #2e7d32;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 18px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 8px solid #1976d2;
+            font-size: 16px;
+        }
+        
+        .promise-chain {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #ff9800;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .interview-log {
+            background: #1a1e2a;
+            color: #b0e0e6;
+            padding: 25px;
+            border-radius: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 2;
+            border: 3px solid #4fc3f7;
+        }
+        
+        .async-demo {
+            background: #e8f0fe;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid #4a90e2;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #4a90e2;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        td {
+            border: 1px solid #b0c4de;
+            padding: 12px;
+        }
+        
+        tr:nth-child(even) {
+            background: #f5f9ff;
+        }
+        
+        tr:hover {
+            background: #e3f2fd;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20mm;
+            }
+            .task {
+                page-break-inside: avoid;
+            }
+            .result-title::before {
+                content: "";
+            }
+        }
+    </style>
+</head>
+<body>
+     <div class="container">
+        <!-- Титульный лист -->
+        <div style="text-align: center; margin-bottom: 50px; page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+            <h1 style="font-size: 24px; margin-top: 50px;">МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ</h1>
+            <h1 style="margin-top: 100px;">МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ</h1>
+            <h2 style="margin: 20px 0;">(кемеровский государственный университет)</h2>
+            <h2 style="margin: 20px 0;">(Институт цифры)</h2>
+            
+            <div style="margin: 100px 0;">
+                <h1 style="font-size: 32px;">ЛАБОРАТОРНАЯ РАБОТА №3</h1>
+                <h2 style="font-size: 24px; margin: 20px 0;">по дисциплине: "Языки программирования"</h2>
+                <h2 style="font-size: 24px;">Тема: "Promise, async/await в JavaScript"</h2>
+            </div>
+            
+ <div style="margin-top: 200px; text-align: right;">
+                <p><strong>Выполнил:</strong> (Киселев Максим Сергеевич)</p>
+                <p><strong>Группа:</strong> (ФИТ-241)</p>
+                <p><strong>Проверил:</strong> (Дуванов  Иван  Олегович)</p>
+            </div>
+            
+            <div style="margin-top: 100px;">
+                <p style="font-size: 18px;">2026</p>
+            </div>
+        </div>
+        
+        <h1>ЛАБОРАТОРНАЯ РАБОТА №5</h1>
+        <h2>Promise, async/await в JavaScript</h2>
+        
+        <!-- Введение -->
+        <div class="info">
+            <strong>📌 О работе:</strong> В данной лабораторной работе изучаются современные подходы к асинхронному программированию в JavaScript: промисы (Promise) и синтаксис async/await. Рассматриваются промисификация, цепочки промисов, обработка ошибок, а также практическое применение для моделирования сложных асинхронных процессов.
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 1 ============= -->
+        <h2>Задание 1. Основы Promise</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 1.1. Анализ кода</h3>
+            <div class="code-block">
+let promise = new Promise(function(resolve, reject) {
+    resolve(1);
+    setTimeout(() => resolve(2), 1000);
+});
+promise.then(console.log);
+            </div>
+            
+            <div class="result">
+                <div class="result-title">Результат выполнения</div>
+                <pre id="result1">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 2 ============= -->
+        <h2>Задание 2. Промисификация (задание 2 из ЛР4)</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 2.1. Промисификация функций</h3>
+            <p>Промисификация функций readConfig, doQuery, httpGet, readFile и выполнение их последовательно с помощью промисов.</p>
+            
+            <div class="result">
+                <div class="result-title">Результат выполнения через промисы</div>
+                <pre id="result2">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 3 ============= -->
+        <h2>Задание 3. Вычисление F(x) с промисами (задание 3 из ЛР4)</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 3.1. F(x) с промисами</h3>
+            <p>Вычисление F(x) = f₁(x) + f₂(x) + ... + fₙ(x) с использованием промисов.</p>
+            
+            <div class="result">
+                <div class="result-title">Результат для n = 3</div>
+                <pre id="result3_n3">⏳ Выполняется...</pre>
+            </div>
+            
+            <div class="result">
+                <div class="result-title">Результат для n = 5</div>
+                <pre id="result3_n5">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 4 ============= -->
+        <h2>Задание 4. Отложенное суммирование</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 4.1. Функция delayedSum</h3>
+            <p>Функция, которая каждые 2 секунды суммирует числа, накапливая результат.</p>
+            
+            <div class="result">
+                <div class="result-title">Успешное выполнение</div>
+                <pre id="result4_success">⏳ Выполняется...</pre>
+            </div>
+            
+            <div class="result">
+                <div class="result-title">Выполнение с ошибкой</div>
+                <pre id="result4_error">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 5 ============= -->
+        <h2>Задание 5. Переписывание через async/await</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 5.1. Задание 2 через async/await</h3>
+            <div class="result">
+                <pre id="result5_2">⏳ Выполняется...</pre>
+            </div>
+            
+            <h3><span class="task-number">✓</span> Задание 5.2. Задание 3 через async/await</h3>
+            <div class="result">
+                <pre id="result5_3">⏳ Выполняется...</pre>
+            </div>
+            
+            <h3><span class="task-number">✓</span> Задание 5.3. Задание 4 через async/await</h3>
+            <div class="result">
+                <pre id="result5_4">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 6 ============= -->
+        <h2>Задание 6. Вызов async-функции из обычной</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 6.1. Получение результата из async функции</h3>
+            <div class="code-block">
+async function wait() {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return 10;
+}
+
+function f() {
+    // Как получить результат wait()?
+}
+            </div>
+            
+            <div class="result">
+                <div class="result-title">Решение</div>
+                <pre id="result6">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- ============= ЗАДАНИЕ 7 ============= -->
+        <h2>Задание 7. Моделирование собеседования</h2>
+        
+        <div class="task">
+            <h3><span class="task-number">✓</span> Задание 7.1. Функция interviews</h3>
+            <p>Моделирование собеседования для нескольких претендентов с двумя заданиями и отдыхом.</p>
+            
+            <div class="info">
+                <strong>Входные данные:</strong> ['Ivan', 5, 2, 7, 2], ['John', 3, 4, 5, 1], ['Sophia', 4, 2, 5, 1]
+            </div>
+            
+            <div class="interview-log">
+                <pre id="result7">⏳ Выполняется...</pre>
+            </div>
+        </div>
+        
+        <!-- Выводы -->
+        <div style="page-break-before: always; margin-top: 70px; padding: 35px; background: linear-gradient(145deg, #e8f0fe, #dae5f5); border-radius: 20px;">
+            <h2>Выводы</h2>
+            <p style="text-indent: 1.25cm; line-height: 1.9; font-size: 16px; text-align: justify;">
+                В ходе выполнения лабораторной работы были изучены современные подходы к асинхронному 
+                программированию в JavaScript: промисы (Promise) и синтаксис async/await. Рассмотрены 
+                ключевые концепции: создание промисов, цепочки промисов, обработка успешного выполнения 
+                и ошибок с помощью then/catch, промисификация callback-функций. Особое внимание уделено 
+                переходу от коллбэков к промисам и от промисов к async/await, что позволяет писать более 
+                читаемый и поддерживаемый асинхронный код. Были решены практические задачи: 
+                последовательное выполнение асинхронных операций, вычисление суммы результатов 
+                асинхронных функций, реализация отложенного суммирования с накоплением результата, 
+                а также моделирование сложного асинхронного процесса (собеседование) с использованием 
+                async/await. Полученные навыки являются основой для современной веб-разработки, где 
+                асинхронные операции (запросы к API, работа с базами данных, таймеры) являются 
+                неотъемлемой частью.
+            </p>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
